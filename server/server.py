@@ -10,6 +10,6 @@ app.register_blueprint(ui_api)
 
 if __name__ == "__main__":
     print("[*] AES-256-GCM C2 Server started on port 5000")
-    print("[*] Web Dashboard available at http://localhost:5000")
+    print("[*] Web Dashboard available at https://localhost:5000")
     app.run(host="0.0.0.0", port=5000, debug=True,ssl_context=('server.crt','server.key'))
 
