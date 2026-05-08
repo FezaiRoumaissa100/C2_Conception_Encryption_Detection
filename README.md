@@ -250,3 +250,20 @@ sudo tshark -r ~/capture_c2.pcap \
 
 **What we found:** The log is **completely empty**. This is intentional and reveals an evasion technique: the victim resolves `micros0ft-update.com` via the local `/etc/hosts` file rather than network DNS queries. No DNS traffic is generated, leaving zero forensic evidence of domain resolution. **This absence itself is a detection signal**—in real investigations, a machine connecting to a domain without corresponding DNS queries suggests DNS-based evasion, a common attacker technique. 
 
+---
+
+#### Beacon Timing Log (beacon_timing.log)
+
+We extracted beacon start times by filtering SYN packets from `conn.log`:
+
+```bash
+grep ",0x0002$" conn.log | cut -d',' -f1 > beacon_timing.log
+```
+
+**Format:** One timestamp per beacon cycle (Unix epoch)
+
+**Key findings:**
+- **59 beacons captured** over 1 hour
+- **Interval range:** 42–77 seconds (configured: 60s ± 30% jitter)
+- **Proves anti-detection works:** Non-random intervals disguise the C2 heartbeat from signature-based detection 
+
