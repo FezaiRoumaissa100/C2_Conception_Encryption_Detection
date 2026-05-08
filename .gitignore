@@ -3,3 +3,6 @@ server.crt
 __pycache__
 venv
 .env
+.idea
+.vscode
+.gitignore

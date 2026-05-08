@@ -129,3 +129,124 @@ python3 agent.py
 - Key size  : 256 bits (32 bytes)
 - Nonce     : 12 bytes random per message
 - Transport : Base64 over HTTPS (TLS)
+
+## Traffic Capture & Log Generation
+
+This section documents the C2 traffic capture and analysis process used to generate network logs for detection analysis.
+
+### Overview
+
+We captured **all network traffic** between the C2 server (Kali, attacker) and the compromised agent (Ubuntu, victim) during a simulated attack over approximately 1 hour. The raw binary PCAP file was then processed into three structured CSV log files using **tshark**, enabling systematic analysis of connection patterns, encryption signatures, and DNS behavior.
+
+### Capture & Execution Process
+
+**Starting the packet capture (victim machine):**
+
+We initialized tcpdump on the victim to capture all traffic on port 5000:
+
+```bash
+sudo tcpdump -i eth0 port 5000 -w ~/capture_c2.pcap
+```
+
+This captured packets to `capture_c2.pcap` for the duration of the test.
+
+**Simulating attacker behavior (via C2 dashboard):**
+
+While tcpdump was running, we accessed the C2 dashboard via https://localhost:5000 in a browser. We systematically executed reconnaissance commands through the agent interface one at a time, observing beaconing behavior (~78 second intervals between commands):
+
+![C2 Dashboard](assets/dashboard.png)
+
+```
+whoami
+id
+uname -a
+hostname
+cat /etc/passwd
+ls -la /home
+ps aux
+df -h
+ip route
+uptime
+```
+
+This simulated a realistic attacker discovering victim system information and configuration. Each command traversed the encrypted C2 channel and was recorded in the packet capture.
+
+### Log Generation from PCAP Data
+
+The raw PCAP file is binary and cannot be analyzed directly—tshark was used to extract and convert captured traffic into three structured CSV log files.
+
+#### Connection Log (conn.log)
+
+We extracted TCP connection metadata to understand traffic patterns and beacon timing:
+
+```bash
+sudo tshark -r ~/capture_c2.pcap \
+  -T fields \
+  -e frame.time_epoch \
+  -e ip.src \
+  -e ip.dst \
+  -e tcp.srcport \
+  -e tcp.dstport \
+  -e frame.len \
+  -e tcp.flags \
+  -E separator=, \
+  -E header=y \
+  > conn.log
+```
+
+**What this captures:** Every TCP connection (handshakes, data transmission, connection close) with precise timestamps, IP addresses, ports, packet sizes, and TCP flags indicating connection state.
+
+**Example record:**
+```
+1778267918.860245,10.19.155.241,10.19.155.22,7045,5000,66,0x0002
+```
+
+This shows: at Unix timestamp 1778267918.86, the victim machine (10.19.155.241) sent a 66-byte SYN packet (flag 0x0002) to the C2 server (10.19.155.22) on port 5000, marking the initiation of a new beacon connection. By analyzing these records, detection systems can identify periodic beaconing behavior and data transfer volumes.
+
+---
+
+#### TLS/SSL Log (ssl.log)
+
+We extracted TLS handshake data to capture encryption signatures:
+
+```bash
+sudo tshark -r ~/capture_c2.pcap \
+  -Y "tls.handshake" \
+  -T fields \
+  -e frame.time_epoch \
+  -e ip.src \
+  -e ip.dst \
+  -e tls.handshake.type \
+  -e tls.handshake.ciphersuite \
+  -e tls.handshake.version \
+  -E separator=, \
+  -E header=y \
+  > ssl.log
+```
+
+**What this attempts to capture:** TLS handshake parameters (version, cipher suites, extensions) which form the **JA3 fingerprint**—a signature identifying the TLS client library even without decryption.
+
+**What we found:** The log is **empty or sparse**. This is expected and significant: AES-256-GCM encryption is effective enough that tshark cannot fully parse the TLS session. The protocol is misidentified as `gsm_ipa`, which actually **confirms our encryption is working properly**. Legitimate C2 tools would show similar signatures, making them hard to detect purely through TLS metadata.
+
+---
+
+#### DNS Log (dns.log)
+
+We extracted all DNS queries during the capture window:
+
+```bash
+sudo tshark -r ~/capture_c2.pcap \
+  -Y "dns" \
+  -T fields \
+  -e frame.time_epoch \
+  -e ip.src \
+  -e ip.dst \
+  -e dns.qry.name \
+  -e dns.a \
+  -E separator=, \
+  -E header=y \
+  > dns.log
+```
+
+**What we found:** The log is **completely empty**. This is intentional and reveals an evasion technique: the victim resolves `micros0ft-update.com` via the local `/etc/hosts` file rather than network DNS queries. No DNS traffic is generated, leaving zero forensic evidence of domain resolution. **This absence itself is a detection signal**—in real investigations, a machine connecting to a domain without corresponding DNS queries suggests DNS-based evasion, a common attacker technique. 
+
