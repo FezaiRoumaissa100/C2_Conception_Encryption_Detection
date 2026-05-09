@@ -1,0 +1,67 @@
+================================================================================
+C2 CHANNEL DETECTION ANALYSIS REPORT
+Blue Team - Detection Pipeline
+================================================================================
+
+Report Generated: 2026-05-09 21:52:59
+
+================================================================================
+1. BEACONING PATTERN ANALYSIS
+================================================================================
+
+Victim IP:              192.168.1.160
+C2 Server:              192.168.1.163:5000
+Total Connections:      21200
+
+Statistical Analysis:
+  Mean Interval:        0.17 seconds
+  Median Interval:      0.00 seconds
+  Std Deviation:        3.23 seconds
+  Min Interval:         0.00 seconds
+  Max Interval:         277.49 seconds
+  Coefficient of Var:   1855.36%
+
+Beacon Score:           0.000
+Confidence:             LOW
+Detected Jitter:        ±1855.4%
+Frequency:              344.44 /min, 20666.47 /hour
+Capture Duration:       61.55 minutes
+
+DETECTION VERDICT: ℹ LOW CONFIDENCE - PATTERN UNCLEAR
+
+================================================================================
+2. BEACON TIMING ANALYSIS
+================================================================================
+
+Total Beacon Packets:   80
+Packet Size:            74.0 bytes
+Size Consistency (σ):   0.00
+
+Statistical Analysis:
+  Mean Interval:        45.88 seconds
+  Median Interval:      57.70 seconds
+  Std Deviation:        27.88 seconds
+  Coefficient of Var:   60.76%
+
+Beacon Score:           0.392
+Confidence:             LOW
+Detected Jitter:        ±60.8%
+Capture Duration:       60.41 minutes
+
+================================================================================
+3. SSL/TLS CERTIFICATE VERIFICATION
+================================================================================
+
+Status: NO TLS CERTIFICATES FOUND
+Possible reasons:
+  • C2 uses plain TCP without encryption
+  • Custom encryption protocol used
+  • Payload encrypted at application level
+
+================================================================================
+SUMMARY
+================================================================================
+
+No high-confidence C2 beaconing detected.
+
+================================================================================
