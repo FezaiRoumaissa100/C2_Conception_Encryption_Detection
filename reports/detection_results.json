@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-05-09T21:52:59.503108",
+  "status": "pending",
+  "analyses": {
+    "beaconing": {
+      "status": "success",
+      "victim_ip": "192.168.1.160",
+      "c2_server": "192.168.1.163:5000",
+      "total_connections": 21200,
+      "statistics": {
+        "mean_interval_sec": 0.17420344719589193,
+        "median_interval_sec": 0.0003478527069091797,
+        "std_deviation": 3.2320984832856423,
+        "min_interval": 0.0,
+        "max_interval": 277.4893989562988,
+        "coefficient_variation_percent": 1855.3585105874195
+      },
+      "beacon_score": 0.0,
+      "confidence": "LOW",
+      "jitter_percent": 1855.3585105874195,
+      "frequency": {
+        "per_minute": 344.44111920880516,
+        "per_hour": 20666.467152528312
+      },
+      "capture_duration_seconds": 3692.938877105713,
+      "sample_intervals": [
+        0.0011630058288574219,
+        0.0026471614837646484,
+        0.00261688232421875,
+        9.5367431640625e-07,
+        0.0010251998901367188,
+        1.9073486328125e-06,
+        0.0017518997192382812,
+        0.001001119613647461,
+        0.0033669471740722656,
+        9.5367431640625e-07,
+        0.0009369850158691406,
+        0.015487194061279297,
+        0.0008978843688964844,
+        2.795970916748047,
+        0.0016050338745117188,
+        9.5367431640625e-07,
+        0.005158185958862305,
+        9.5367431640625e-07,
+        0.0012240409851074219,
+        9.5367431640625e-07
+      ]
+    },
+    "beacon_timing": {
+      "status": "success",
+      "total_packets": 80,
+      "packet_size": 74.0,
+      "packet_size_consistency": 0.0,
+      "statistics": {
+        "mean_interval_sec": 45.88404653042178,
+        "median_interval_sec": 57.69770407676697,
+        "std_deviation": 27.877885418592513,
+        "coefficient_variation_percent": 60.75725121608243
+      },
+      "beacon_score": 0.3924274878391757,
+      "confidence": "LOW",
+      "jitter_percent": 60.75725121608243,
+      "capture_duration_seconds": 3624.8396759033203
+    },
+    "ssl_verification": {
+      "status": "no_tls_found",
+      "message": "No TLS handshakes in capture",
+      "recommendation": "Verify C2 configuration for encryption method"
+    }
+  },
+  "detections": []
+}

@@ -1,4 +1,4 @@
-# MYC2_Pannel
+# MYC2_Panel
 
 A modern, encrypted Command and Control (C2) server with a web dashboard, using **AES-256-GCM** for payload encryption and **TLS (HTTPS)** for transport security.
 
